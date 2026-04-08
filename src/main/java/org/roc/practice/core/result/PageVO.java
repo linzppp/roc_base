@@ -28,7 +28,7 @@ public class PageVO<T> implements Serializable {
         vo.setTotal(total);
         vo.setPageNum(pageNum);
         vo.setPageSize(pageSize);
-        vo.setPages((int)Math.ceil(total/pageSize));
+        vo.setPages((int)Math.ceil((double)total/pageSize));
         return vo;
     }
 

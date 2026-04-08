@@ -4,14 +4,13 @@ import lombok.Getter;
 import org.roc.practice.core.constant.ResultCode;
 
 @Getter
-public class BusinessException extends RuntimeException {
+public class BusinessException extends BaseException {
     private final ResultCode resultCode;
     private final String customMsg;
 
     public BusinessException(ResultCode resultCode, String customMsg) {
-        super();
+        super(resultCode, customMsg);
         this.resultCode = resultCode;
         this.customMsg = customMsg;
     }
-
 }

@@ -3,6 +3,7 @@ package org.roc.practice.core.result;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,6 +12,8 @@ import java.util.List;
  * size 滑动查询的分页大小
  * nextCursor 滑动查询的下一起点(将被包含); 只适用于id按时间戳递增的场景
  * hasNext 是否有下一滑页
+ *
+ * 使用该类必须实现ScrollCursorTarget接口
  */
 @Data
 public class ScrollVO<T> implements Serializable {
@@ -19,27 +22,21 @@ public class ScrollVO<T> implements Serializable {
     private Long nextCursor;
     private Boolean hasNext;
 
-    public static <T> ScrollVO<T> of(List<T> list, int size) {
+    public static <T extends CursorTarget> ScrollVO<T> of(List<T> list, int size) {
         ScrollVO<T> vo = new ScrollVO<>();
+        List<T> listCopy = new ArrayList<>(list);
         Boolean hasNext = list.size() > size;
         if (hasNext) {
-            T item = list.remove(list.size() - 1);
-            Long id = getId(item);
+            T item = listCopy.remove(list.size() - 1);
+            Long id = item.getCursorPosition();
             vo.setNextCursor(id);
         } else {
             vo.setNextCursor(null);
         }
-        vo.setList(list);
+        vo.setList(listCopy);
         vo.setSize(size);
         vo.setHasNext(hasNext);
         return vo;
     }
 
-    private static Long getId(Object obj) {
-        try {
-            return (Long) obj.getClass().getMethod("getId").invoke(obj);
-        } catch (Exception e) {
-            return null;
-        }
-    }
 }
