@@ -5,12 +5,10 @@ import org.roc.practice.core.constant.ResultCode;
 
 @Getter
 public class BusinessException extends BaseException {
-    private final ResultCode resultCode;
     private final String customMsg;
 
     public BusinessException(ResultCode resultCode, String customMsg) {
         super(resultCode, customMsg);
-        this.resultCode = resultCode;
         this.customMsg = customMsg;
     }
 }

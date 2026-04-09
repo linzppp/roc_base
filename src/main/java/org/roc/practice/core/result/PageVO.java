@@ -1,6 +1,6 @@
 package org.roc.practice.core.result;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
+//import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -32,13 +32,13 @@ public class PageVO<T> implements Serializable {
         return vo;
     }
 
-    public static<T> PageVO<T> from(IPage<T> page){
-        PageVO<T> vo = new PageVO<>();
-        vo.setList(page.getRecords());
-        vo.setTotal(page.getTotal());
-        vo.setPageSize((int)page.getSize());
-        vo.setPageNum((int)page.getCurrent());
-        vo.setPages((int)page.getPages());
-        return vo;
-    }
+//    public static<T> PageVO<T> from(IPage<T> page){
+//        PageVO<T> vo = new PageVO<>();
+//        vo.setList(page.getRecords());
+//        vo.setTotal(page.getTotal());
+//        vo.setPageSize((int)page.getSize());
+//        vo.setPageNum((int)page.getCurrent());
+//        vo.setPages((int)page.getPages());
+//        return vo;
+//    }
 }

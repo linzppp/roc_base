@@ -29,6 +29,7 @@ public class Result<T> implements Serializable {
         result.setBizCode(bizCode);
         result.setMsg(msg);
         result.setData(data);
+        // TODO 实现MCD全链路日志
         result.setTraceId(null);
         result.setRespTs(System.currentTimeMillis());
         return result;
