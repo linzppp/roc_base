@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 import java.util.stream.Collectors;
 
@@ -36,7 +37,18 @@ public class GlobalExceptionHandler {
         String msg = e.getBindingResult().getFieldErrors()
                 .stream()
                 .map(fe -> fe.getField()+ ": " + fe.getDefaultMessage())
-                .collect(Collectors.joining());
+                .collect(Collectors.joining("; "));
+        Result<?> body = Result.error(code, msg);
+        return ResponseEntity.status(code.getHttpStatus()).body(body);
+    }
+
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ResponseEntity<Result<?>> handMethodValidate(MethodArgumentNotValidException e){
+        ResultCode code = ResultCode.PARAM_ERROR;
+        String msg = e.getBindingResult().getFieldErrors()
+                .stream()
+                .map(fe -> fe.getField()+ ": " + fe.getDefaultMessage())
+                .collect(Collectors.joining("; "));
         Result<?> body = Result.error(code, msg);
         return ResponseEntity.status(code.getHttpStatus()).body(body);
     }
