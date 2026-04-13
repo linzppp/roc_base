@@ -1,7 +1,8 @@
-package org.roc.practice.core.result;
+package org.roc.practice.result;
 
 import lombok.Data;
-import org.roc.practice.core.constant.ResultCode;
+import org.roc.practice.constant.CommonResultCode;
+import org.roc.practice.constant.IResultCode;
 
 import java.io.Serializable;
 
@@ -12,7 +13,6 @@ public class Result<T> implements Serializable {
     private T data;
     // 占位，暂时不生效
     private String traceId;
-    private Long respTs;
 
     private Result(){}
 
@@ -28,26 +28,23 @@ public class Result<T> implements Serializable {
         Result<T> result = new Result<>();
         result.setBizCode(bizCode);
         result.setMsg(msg);
-        result.setData(data);
+        if(data != null){
+            result.setData(data);
+        }
         // TODO 实现MCD全链路日志
         result.setTraceId(null);
-        result.setRespTs(System.currentTimeMillis());
         return result;
     }
 
     public static <T> Result<T> success(T data){
-        return build(ResultCode.SUCCESS.getBizCode(), ResultCode.SUCCESS.getMsg(), data);
+        return build(CommonResultCode.SUCCESS.getCode(), CommonResultCode.SUCCESS.getMessage(), data);
     }
 
     public static <T> Result<T> success(){
-        return build(ResultCode.SUCCESS.getBizCode(), ResultCode.SUCCESS.getMsg(), null);
+        return build(CommonResultCode.SUCCESS.getCode(), CommonResultCode.SUCCESS.getMessage(), null);
     }
 
-    public static <T> Result<T> error(ResultCode bizCodeEnum){
-        return build(bizCodeEnum.getBizCode(), bizCodeEnum.getMsg(), null);
-    }
-
-    public static <T> Result<T> error(ResultCode bizCodeEnum, String customMsg) {
-        return build(bizCodeEnum.getBizCode(), customMsg, null);
+    public static <T> Result<T> error(IResultCode errorCode){
+        return build(errorCode.getCode(), errorCode.getMessage(), null);
     }
 }
