@@ -23,8 +23,6 @@ public class ScrollVo<T> implements Serializable {
             T item = listCopy.remove(list.size() - 1);
             Long id = item.getCursorId();
             vo.setNextCursor(id);
-        } else {
-            vo.setNextCursor(null);
         }
         vo.setRecords(listCopy);
         vo.setSize(size);

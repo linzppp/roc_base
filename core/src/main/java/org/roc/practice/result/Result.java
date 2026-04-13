@@ -47,4 +47,8 @@ public class Result<T> implements Serializable {
     public static <T> Result<T> error(IResultCode errorCode){
         return build(errorCode.getCode(), errorCode.getMessage(), null);
     }
+
+    public static <T> Result<T> error(IResultCode errorCode, String message){
+        return build(errorCode.getCode(), message, null);
+    }
 }

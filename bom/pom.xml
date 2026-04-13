@@ -12,9 +12,6 @@
     <artifactId>bom</artifactId>
 
     <properties>
-        <!-- ===== Spring ===== -->
-        <spring-boot.version>3.5.6</spring-boot.version>
-
         <!-- ===== Persistence ===== -->
         <mybatis-plus.version>3.5.9</mybatis-plus.version>
 
@@ -46,13 +43,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring-boot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
 
             <!-- ==================== Persistence ==================== -->
             <dependency>
