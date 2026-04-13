@@ -51,4 +51,28 @@ public class Result<T> implements Serializable {
     public static <T> Result<T> error(IResultCode errorCode, String message){
         return build(errorCode.getCode(), message, null);
     }
+
+    public static <T> Result<T> error(IResultCode errorCode, String message, T data){
+        return build(errorCode.getCode(), message, data);
+    }
+
+    public static <T> Result<T> ok(T data){
+        return success(data);
+    }
+
+    public static <T> Result<T> ok(){
+        return success();
+    }
+
+    public static <T> Result<T> fail(IResultCode errorCode){
+        return error(errorCode);
+    }
+
+    public static <T> Result<T> fail(IResultCode errorCode, String message){
+        return error(errorCode, message);
+    }
+
+    public static <T> Result<T> fail(IResultCode errorCode, String message, T data){
+        return error(errorCode, message, data);
+    }
 }
