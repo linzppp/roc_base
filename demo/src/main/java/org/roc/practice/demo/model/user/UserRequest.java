@@ -1,6 +1,5 @@
-package model.user;
+package org.roc.practice.demo.model.user;
 
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import jakarta.validation.groups.Default;
 import lombok.AllArgsConstructor;
@@ -20,10 +19,10 @@ public class UserRequest {
     @Min(value = 0, message = "年龄应大于0岁")
     @Max(value = 199, message = "年龄不能超过199岁")
     private Integer age;
-    @Pattern(regexp =  "^1[3-9]\\d{9}$", message = "请输入手机号, 应符合中国大陆手机号规格, 11位")
+    @Pattern(regexp = "^1[3-9]\\d{9}$", message = "请输入手机号, 应符合中国大陆手机号规格, 11位")
     @NotNull(message = "手机号不能为空")
-    private Integer phone;
+    private String phone;
     @NotNull
     @Length(min = 10, max = 10)
-    private String passwork;
+    private String password;
 }
