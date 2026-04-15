@@ -34,6 +34,8 @@ public class GlobalExceptionHandler {
 
     /**
      * form 表单绑定失败（@ModelAttribute 等场景）
+     * msg = 第一个字段的错误信息（用户友好）
+     * data = 所有字段错误的结构化 Map（便于前端精确定位）
      */
     @ExceptionHandler(BindException.class)
     public ResponseEntity<Result<Map<String, String>>> handleBind(BindException e) {

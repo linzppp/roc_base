@@ -13,6 +13,7 @@
         <module>bom</module>
         <module>core</module>
         <module>web</module>
+        <module>demo</module>
     </modules>
 
     <parent>
