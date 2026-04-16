@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.roc.practice.constant.CommonResultCode;
 import org.roc.practice.constant.IResultCode;
 import org.roc.practice.exception.BaseException;
+import org.roc.practice.exception.BusinessException;
+import org.roc.practice.exception.RocSystemException;
 import org.roc.practice.result.Result;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -56,14 +58,26 @@ public class GlobalExceptionHandler {
 
     /**
      * 受控业务异常（BusinessException / BaseException 子类）
-     * HTTP 状态码由 IResultCode.getHttpStatus() 决定
+     * 通常非系统错误，是可预期的业务错误；需要‘用户’配合操作系统
      */
-    @ExceptionHandler(BaseException.class)
-    public ResponseEntity<Result<?>> handleBase(BaseException e) {
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<Result<?>> handleBusiness(BaseException e) {
         IResultCode rc = e.getResultCode();
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Result.error(rc, e.getMessage()));
+        return ResponseEntity.ok().body(Result.error(rc, e.getMessage()));
     }
+
+    /**
+     * 非受控系统异常
+     * 用户正常行为但导致系统非预期逻辑 ，致使逻辑无法执行/判断异常
+     * 需要研发介入调查
+     */
+    @ExceptionHandler(RocSystemException.class)
+    public ResponseEntity<Result<?>> handleRocSystem(BaseException e, HttpServletRequest request){
+        IResultCode rc = e.getResultCode();
+        log.error("RocSystemException:{}, happens on {}", e.getMessage(), request.getRequestURI());
+        return ResponseEntity.internalServerError().body(Result.error(rc, e.getMessage()));
+    }
+
 
     /**
      * 兜底：未预期异常，打完整日志，返回 500
