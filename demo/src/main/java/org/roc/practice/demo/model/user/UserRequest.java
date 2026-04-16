@@ -12,7 +12,7 @@ import org.roc.practice.validate.Update;
 @AllArgsConstructor
 public class UserRequest {
     @Null(groups = {Create.class}, message = "用户ID在创建时不能赋值")
-    @NotNull(groups = {Update.class, Default.class}, message = "用户ID不能为空")
+    @NotNull(groups = {Update.class}, message = "用户ID不能为空")
     private Long userId;
     @NotBlank(message = "未填写用户姓名")
     private String userName;

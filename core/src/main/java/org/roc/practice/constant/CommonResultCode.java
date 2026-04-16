@@ -12,6 +12,7 @@ public enum CommonResultCode implements IResultCode{
     TOKEN_INVALID("A0002","登陆令牌失效"),
     NO_PERMISSION("A0003","暂无操作权限"),
     NOT_FOUND("A0004","资源不存在"),
+    NOT_READABLE("A0005","请求体解析失败，请检查参数格式"),
 
     // 业务逻辑不满足，需要提示用户
     RESUBMIT_FAILED("B0001", "请勿重复操作"),

@@ -1,5 +1,7 @@
 package org.roc.practice.handler;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.roc.practice.constant.CommonResultCode;
@@ -8,6 +10,7 @@ import org.roc.practice.exception.BaseException;
 import org.roc.practice.result.Result;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -40,6 +43,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BindException.class)
     public ResponseEntity<Result<Map<String, String>>> handleBind(BindException e) {
         return buildValidationResponse(e);
+    }
+
+    /**
+     * 请求体解析失败, 存在四种可能:
+     * JSON格式匹配失败, 要求字段类型与传入类型不匹配, 枚举值/日期格式非法, 请求体为空但是 contentType声明为 Json
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Result<?>> handleNotReadable(HttpMessageNotReadableException ex) {
+        return ResponseEntity.badRequest().body(Result.error(CommonResultCode.NOT_READABLE));
     }
 
     /**
