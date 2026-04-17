@@ -138,7 +138,7 @@ class DemoControllerTest {
         mockMvc.perform(post("/demo/order/create")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(order)))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.bizCode").value("A0001"));
     }
 
@@ -150,7 +150,7 @@ class DemoControllerTest {
         mockMvc.perform(post("/demo/order/create")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(order)))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.bizCode").value("A0001"))
                 .andExpect(jsonPath("$.msg").value(containsString("支付金额必须是正数")));
     }
@@ -163,7 +163,7 @@ class DemoControllerTest {
         mockMvc.perform(post("/demo/order/create")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(order)))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.bizCode").value("A0001"))
                 .andExpect(jsonPath("$.msg").value(containsString("你只能订阅今天以后的")));
     }
@@ -225,7 +225,7 @@ class DemoControllerTest {
     @DisplayName("7. GET /demo/exception/business → bizCode=A0004, msg 含自定义文本")
     void businessException_returnsNotFoundCode() throws Exception {
         mockMvc.perform(get("/demo/exception/business"))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.bizCode").value("A0004"))
                 .andExpect(jsonPath("$.msg").value(containsString("演示：目标资源不存在")));
     }
