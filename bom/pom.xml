@@ -14,6 +14,7 @@
     <properties>
         <!-- ===== Persistence ===== -->
         <mybatis-plus.version>3.5.9</mybatis-plus.version>
+        <dynamic-datasource.version>4.3.1</dynamic-datasource.version>
 
         <!-- ===== Object Mapping ===== -->
         <mapstruct.version>1.6.3</mapstruct.version>
@@ -49,6 +50,12 @@
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
                 <version>${mybatis-plus.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>dynamic-datasource-spring-boot3-starter</artifactId>
+                <version>${dynamic-datasource.version}</version>
             </dependency>
 
             <!-- ==================== Object Mapping ==================== -->

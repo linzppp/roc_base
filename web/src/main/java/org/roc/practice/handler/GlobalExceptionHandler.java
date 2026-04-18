@@ -63,7 +63,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<Result<?>> handleBusiness(BaseException e) {
         IResultCode rc = e.getResultCode();
-        return ResponseEntity.ok().body(Result.error(rc, e.getMessage()));
+        return ResponseEntity.ok().body(Result.error(rc, e.getMessage() ));
     }
 
     /**
@@ -77,7 +77,6 @@ public class GlobalExceptionHandler {
         log.error("RocSystemException:{}, happens on {}", e.getMessage(), request.getRequestURI());
         return ResponseEntity.internalServerError().body(Result.error(rc, e.getMessage()));
     }
-
 
     /**
      * 兜底：未预期异常，打完整日志，返回 500
