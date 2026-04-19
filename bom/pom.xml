@@ -68,6 +68,7 @@
                 <groupId>org.mapstruct</groupId>
                 <artifactId>mapstruct-processor</artifactId>
                 <version>${mapstruct.version}</version>
+                <scope>provided</scope>
             </dependency>
 
             <!-- ==================== API Docs ==================== -->
@@ -127,6 +128,12 @@
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>${guava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>1.18.40</version>
+                <scope>provided</scope>
             </dependency>
        </dependencies>
     </dependencyManagement>
