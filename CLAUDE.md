@@ -53,6 +53,7 @@ All controller responses are automatically wrapped in `Result<T>` via `ResponseA
   - `SUCCESS("00000")`, `PARAM_ERROR("A0001")`, `TOKEN_INVALID("A0002")`, `NO_PERMISSION("A0003")`, `NOT_FOUND("A0004")`, `NOT_READABLE("A0005")`, `RESUBMIT_FAILED("B0001")`, `SYSTEM_ERROR("C0001")`, `REMOTE_CALL_FAILED("D0001")`
 - `ResponseAutoWrapper` — skips wrapping if body is already a `Result`
 - `WebMvcConfig` removes `StringHttpMessageConverter` so String return types are wrapped correctly (not intercepted before `ResponseAutoWrapper`)
+- `JacksonConfig` registers: `Long`/`long` serialized as String (avoids JS precision loss for snowflake IDs), `LocalDateTime` formatted as `"yyyy-MM-dd HH:mm:ss"`, `FAIL_ON_UNKNOWN_PROPERTIES` disabled (tolerates extra fields from downstream services)
 
 ### Exception Handling
 
@@ -95,6 +96,8 @@ Both live in `core/result/`:
 - `LogicDeleteEntity extends BaseEntity` — adds `deleted` field annotated with `@TableLogic`
 
 `MyBatisPlusConfig` registers two interceptors: `PaginationInnerInterceptor` (MySQL, max 1000/page) and `BlockAttackInnerInterceptor` (prevents full-table UPDATE/DELETE).
+
+`BaseMetaObjectHandler` implements `MetaObjectHandler` to auto-fill audit fields on insert/update. Insert uses `strictInsertFill` (only fills if null); update uses `setFieldValByName` (force-overwrites). `getCurrentUserId()` is a TODO — wire in auth context when auth is implemented.
 
 ## BOM Module
 
