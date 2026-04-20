@@ -2,8 +2,12 @@ package org.roc.practice.page;
 
 import lombok.Data;
 
-import java.util.Set;
 
+/**
+ * Page/Scroll 不定义OrderBy字段
+ * 业务系统通过继承两基类，自由抉择是否进行OrderBy。
+ * 若要进行OrderBy，应采用枚举类型。
+ */
 @Data
 public class PageQuery {
     private static final int DEFAULT_PAGE = 1;
