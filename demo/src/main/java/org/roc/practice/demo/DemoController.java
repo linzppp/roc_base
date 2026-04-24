@@ -54,7 +54,7 @@ public class DemoController {
                 .rangeClosed((long) (current - 1) * size + 1, (long) current * size)
                 .mapToObj(i -> new UserVo(i, "用户" + i))
                 .toList();
-        return Result.success(PageVo.of(records, 100L, current, size));
+        return Result.success(PageVo.of(records, 100, current, size));
     }
 
     /** 核验点6: 游标分页 ScrollVo — GET /demo/scroll?cursor=0&size=5 */

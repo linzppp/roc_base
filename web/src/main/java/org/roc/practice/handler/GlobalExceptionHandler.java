@@ -53,7 +53,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Result<?>> handleNotReadable(HttpMessageNotReadableException ex) {
-        return ResponseEntity.badRequest().body(Result.error(CommonResultCode.NOT_READABLE));
+        return ResponseEntity.ok().body(Result.error(CommonResultCode.NOT_READABLE));
     }
 
     /**
@@ -75,7 +75,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Result<?>> handleRocSystem(BaseException e, HttpServletRequest request){
         IResultCode rc = e.getResultCode();
         log.error("RocSystemException:{}, happens on {}", e.getMessage(), request.getRequestURI());
-        return ResponseEntity.internalServerError().body(Result.error(rc, e.getMessage()));
+        return ResponseEntity.ok().body(Result.error(rc, e.getMessage()));
     }
 
     /**
@@ -84,7 +84,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Result<?>> handleException(Exception e, HttpServletRequest request) {
         log.error("Unhandled exception on [{}]", request.getRequestURI(), e);
-        return ResponseEntity.internalServerError()
+        return ResponseEntity.ok()
                 .body(Result.error(CommonResultCode.SYSTEM_ERROR));
     }
 
@@ -99,7 +99,7 @@ public class GlobalExceptionHandler {
         for (FieldError fe : fieldErrors) {
             errors.putIfAbsent(fe.getField(), fe.getDefaultMessage());
         }
-        return ResponseEntity.badRequest()
+        return ResponseEntity.ok()
                 .body(Result.error(CommonResultCode.PARAM_ERROR, msg, errors));
     }
 }

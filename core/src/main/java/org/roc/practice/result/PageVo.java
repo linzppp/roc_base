@@ -9,13 +9,13 @@ import java.util.List;
 public class PageVo<T> implements Serializable {
     private List<T> records;
     // 总条目数
-    private Long total;
+    private Integer total;
     // 当前页码
     private Integer current;
     // 页大小
     private Integer size;
 
-    public static<T> PageVo<T> of(List<T> list, long total, Integer current, Integer size){
+    public static<T> PageVo<T> of(List<T> list, Integer total, Integer current, Integer size){
         PageVo<T> vo = new PageVo<>();
         vo.setRecords(list);
         vo.setTotal(total);

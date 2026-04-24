@@ -32,7 +32,7 @@ public class BaseMetaObjectHandler implements MetaObjectHandler {
         // set操作
         // 强制赋值，不允许业务预填
         this.setFieldValByName("updateTime", now, metaObject);
-        this.setFieldValByName("createBy", userId, metaObject);
+        this.setFieldValByName("updateBy", userId, metaObject);
     }
 
     private Long getCurrentUserId(){

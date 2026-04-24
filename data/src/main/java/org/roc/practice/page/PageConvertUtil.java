@@ -11,7 +11,7 @@ public class PageConvertUtil {
     private static <T> PageVo<T> toPageVo(IPage<T> page){
         return PageVo.of(
                 page.getRecords(),
-                page.getTotal(),
+                (int) page.getTotal(),
                 (int) page.getCurrent(),
                 (int) page.getSize()
         );
