@@ -63,7 +63,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<Result<?>> handleBusiness(BaseException e) {
         IResultCode rc = e.getResultCode();
-        return ResponseEntity.ok().body(Result.error(rc, e.getMessage() ));
+        return ResponseEntity.ok().body(Result.error(rc, e.getMessage()));
     }
 
     /**
@@ -72,7 +72,7 @@ public class GlobalExceptionHandler {
      * 需要研发介入调查
      */
     @ExceptionHandler(RocSystemException.class)
-    public ResponseEntity<Result<?>> handleRocSystem(BaseException e, HttpServletRequest request){
+    public ResponseEntity<Result<?>> handleRocSystem(BaseException e, HttpServletRequest request) {
         IResultCode rc = e.getResultCode();
         log.error("RocSystemException:{}, happens on {}", e.getMessage(), request.getRequestURI());
         return ResponseEntity.ok().body(Result.error(rc, e.getMessage()));
