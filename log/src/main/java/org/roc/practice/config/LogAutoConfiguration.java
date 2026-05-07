@@ -1,5 +1,6 @@
 package org.roc.practice.config;
 
+import org.roc.practice.decorator.MdcTaskDecorator;
 import org.roc.practice.filter.TraceIdFilter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -17,5 +18,10 @@ public class LogAutoConfiguration {
         registration.addUrlPatterns("/*");
         registration.setOrder(Ordered.HIGHEST_PRECEDENCE);
         return registration;
+    }
+
+    @Bean
+    public MdcTaskDecorator mdcTaskDecorator() {
+        return new MdcTaskDecorator();
     }
 }
