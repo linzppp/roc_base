@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- ========== 本地开发：可读彩色控制台 ========== -->
+    <springProfile name="local,dev">
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level [%X{traceId},%X{spanId}] %logger{36} - %msg%n</pattern>
+                <charset>UTF-8</charset>
+            </encoder>
+        </appender>
+
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+
+    <!-- ========== 生产/预发：JSON 结构化日志（ELK 采集） ========== -->
+    <springProfile name="prod,staging">
+
+        <appender name="JSON_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>logs/app.log</file>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <fileNamePattern>logs/app.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+                <timeBasedFileNamingAndTriggeringPolicy
+                        class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                    <maxFileSize>200MB</maxFileSize>
+                </timeBasedFileNamingAndTriggeringPolicy>
+                <maxHistory>7</maxHistory>
+            </rollingPolicy>
+
+            <!-- LogstashEncoder 自动将 MDC 所有字段输出为 JSON 字段 -->
+            <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+                <!-- 注入静态字段：服务名、环境 -->
+
+                <customFields>{"appName":"${spring.application.name:-roc-app}","env":"${spring.profiles.active:-unknown}"}</customFields>
+            </encoder>
+        </appender>
+
+        <!-- AsyncAppender 异步写入，避免 I/O 阻塞业务线程 -->
+        <appender name="ASYNC_JSON" class="ch.qos.logback.classic.AsyncAppender">
+            <queueSize>512</queueSize>
+            <!-- 队列满时不丢弃 WARN/ERROR -->
+            <discardingThreshold>0</discardingThreshold>
+            <appender-ref ref="JSON_FILE"/>
+        </appender>
+
+        <root level="INFO">
+            <appender-ref ref="ASYNC_JSON"/>
+        </root>
+    </springProfile>
+
+</configuration>

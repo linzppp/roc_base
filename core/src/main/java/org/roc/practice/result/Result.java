@@ -31,8 +31,8 @@ public class Result<T> implements Serializable {
         if(data != null){
             result.setData(data);
         }
-        // TODO 实现MCD全链路日志
-        result.setTraceId(null);
+
+        result.setTraceId(org.slf4j.MDC.get("traceId"));
         return result;
     }
 

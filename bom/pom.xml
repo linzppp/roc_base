@@ -16,6 +16,9 @@
         <mybatis-plus.version>3.5.9</mybatis-plus.version>
         <dynamic-datasource.version>4.3.1</dynamic-datasource.version>
 
+        <!-- ===== Log ===== -->
+        <logstash-logback-encoder.version>8.0</logstash-logback-encoder.version>
+
         <!-- ===== Object Mapping ===== -->
         <mapstruct.version>1.6.3</mapstruct.version>
 
@@ -141,6 +144,12 @@
                 <artifactId>mybatis-plus-jsqlparser</artifactId>
                 <version>${mybatis-plus.version}</version>
                 <scope>compile</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>net.logstash.logback</groupId>
+                <artifactId>logstash-logback-encoder</artifactId>
+                <version>${logstash-logback-encoder.version}</version>
             </dependency>
        </dependencies>
     </dependencyManagement>
