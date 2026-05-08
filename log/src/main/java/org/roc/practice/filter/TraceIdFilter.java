@@ -12,6 +12,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+/**
+ * TraceId不回写到Response当中, 而是依赖 CORE模块当中 Result类 输出到responseBody中
+ */
 public class TraceIdFilter extends OncePerRequestFilter {
     private final String appName;
 
