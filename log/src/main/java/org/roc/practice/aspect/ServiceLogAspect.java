@@ -7,9 +7,11 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.roc.practice.annotation.Logged;
+import org.springframework.stereotype.Component;
 
 @Aspect
 @Slf4j
+@Component
 public class ServiceLogAspect {
     private final ObjectMapper objectMapper;
 
@@ -20,21 +22,21 @@ public class ServiceLogAspect {
     @Around("@annotation(logged) || @within(logged)")
     public Object around(ProceedingJoinPoint pjp, Logged logged) throws Throwable {
         MethodSignature sig = (MethodSignature) pjp.getSignature();
-        String methodName = String.format("%s.$s", sig.getDeclaringTypeName(), sig.getName());
-        Long start = System.currentTimeMillis();
+        String methodName = String.format("%s.%s", sig.getDeclaringTypeName(), sig.getName());
+        long start = System.currentTimeMillis();
 
         String argsJson = "";
         if (logged.logArgs()) {
             // TODO
             // 无法处理Byte[]流, 需要规范此场景的日志
-            argsJson = objectMapper.writeValueAsString(pjp.getArgs());
+            argsJson = safeSerialize(pjp.getArgs());
         }
 
         Object result;
         try {
             result = pjp.proceed();
         } catch (Throwable e) {
-            Long elapsed = System.currentTimeMillis() - start;
+            long elapsed = System.currentTimeMillis() - start;
             log.warn("[{}] exception={} elapsed={}ms args={}",
                     methodName,
                     e.getClass().getSimpleName(),
@@ -46,11 +48,19 @@ public class ServiceLogAspect {
 
         String responseJson = "";
         if (logged.logResult()) {
-            responseJson = objectMapper.writeValueAsString(result);
+            responseJson = safeSerialize(result);
         }
 
-        Long elapsed = System.currentTimeMillis() - start;
+        long elapsed = System.currentTimeMillis() - start;
         log.debug("[{}] elapsed={}ms args={} resp={}", methodName, elapsed, argsJson, responseJson);
         return result;
+    }
+
+    private String safeSerialize(Object obj) {
+        try {
+            return objectMapper.writeValueAsString(obj);
+        } catch (Exception e) {
+            return String.valueOf(obj);
+        }
     }
 }

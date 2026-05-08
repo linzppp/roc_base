@@ -1,6 +1,6 @@
 package org.roc.practice.filter;
 
-import io.micrometer.common.util.StringUtils;
+import org.springframework.util.StringUtils;;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,7 +28,7 @@ public class TraceIdFilter extends OncePerRequestFilter {
 
     private void initMdc(HttpServletRequest request){
         String traceId = request.getHeader(TraceConstants.HEADER_TRACE_ID);
-        if(StringUtils.isBlank(traceId)){
+        if(StringUtils.hasText(traceId)){
             traceId = TraceIdGenerator.generateTraceId();
         }
 
