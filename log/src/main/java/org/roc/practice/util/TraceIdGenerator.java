@@ -1,23 +1,23 @@
 package org.roc.practice.util;
 
-import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class TraceIdGenerator {
     private TraceIdGenerator() {}
 
     /**
-     * B3规范的TraceId, 长度为 128bit 32字符.
-     * 直接用UUID去横杠即可满足
+     * B3规范的TraceId，128bit，32位小写十六进制字符串。
+     * 使用 ThreadLocalRandom 替代 UUID（SecureRandom），避免高并发下熵池竞争。
      */
     public static String generateTraceId() {
-        return UUID.randomUUID().toString().replace("-", "");
+        ThreadLocalRandom r = ThreadLocalRandom.current();
+        return String.format("%016x%016x", r.nextLong(), r.nextLong());
     }
 
     /**
-     * B3规范的SpanId, 长度为 64bit 16字符
-     * 使用UUID去横杠并截串
+     * B3规范的SpanId，64bit，16位小写十六进制字符串。
      */
     public static String generateSpanId() {
-        return UUID.randomUUID().toString().replace("-","").substring(0, 16);
+        return String.format("%016x", ThreadLocalRandom.current().nextLong());
     }
 }

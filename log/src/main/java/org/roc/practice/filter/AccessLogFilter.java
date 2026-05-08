@@ -6,13 +6,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
-import org.springframework.web.HttpRequestHandler;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
 @Slf4j
 public class AccessLogFilter extends OncePerRequestFilter {
+    private static final long SLOW_REQUEST_THRESHOLD_MS = 1000;
+
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
@@ -24,30 +25,40 @@ public class AccessLogFilter extends OncePerRequestFilter {
             chain.doFilter(request, response);
         } finally {
             long elapsed = System.currentTimeMillis() - start;
-            log.info("ACCESS | {} {} status={} elapsed={}ms ip={}",
+            String msg = "ACCESS | {} {} status={} elapsed={}ms ip={}";
+            Object[] args = {
                     request.getMethod(),
                     buildUri(request),
                     response.getStatus(),
                     elapsed,
-                    getClientIp(request));
+                    getClientIp(request)
+            };
+            if (elapsed >= SLOW_REQUEST_THRESHOLD_MS) {
+                log.warn(msg, args);
+            } else {
+                log.info(msg, args);
+            }
         }
     }
 
     private String buildUri(HttpServletRequest request) {
         String uri = request.getRequestURI();
         String query = request.getQueryString();
-        if (!StringUtils.hasText(query)) {
+        if (StringUtils.hasText(query)) {
             return String.format("%s?%s", uri, query);
         }
         return uri;
     }
 
     private String getClientIp(HttpServletRequest request) {
+        String xri = request.getHeader("X-Real-IP");
+        if (StringUtils.hasText(xri)) {
+            return xri;
+        }
         String xff = request.getHeader("X-Forwarded-For");
         if (StringUtils.hasText(xff)) {
             return xff.split(",")[0].trim();
         }
-
         return request.getRemoteAddr();
     }
 }

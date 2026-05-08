@@ -8,6 +8,7 @@ import org.roc.practice.filter.AccessLogFilter;
 import org.roc.practice.filter.TraceIdFilter;
 import org.roc.practice.serializer.SensitiveJacksonModule;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +18,9 @@ import org.springframework.core.Ordered;
 @Configuration
 @ConditionalOnWebApplication
 public class LogAutoConfiguration {
+    @Value("${spring.application.name:unknown}")
+    private String appName;
+
     @Bean("logObjectMapper")
     public ObjectMapper logObjectMapper() {
         ObjectMapper mapper = new ObjectMapper();
@@ -28,7 +32,7 @@ public class LogAutoConfiguration {
     @Bean
     public FilterRegistrationBean<TraceIdFilter> traceIdFilterRegistration() {
         FilterRegistrationBean<TraceIdFilter> registration = new FilterRegistrationBean<>();
-        registration.setFilter(new TraceIdFilter());
+        registration.setFilter(new TraceIdFilter(appName));
         registration.addUrlPatterns("/*");
         registration.setOrder(Ordered.HIGHEST_PRECEDENCE);
         return registration;
@@ -49,7 +53,7 @@ public class LogAutoConfiguration {
     }
 
     @Bean
-    public ServiceLogAspect serviceLogAspect(@Qualifier("logObjectMapper") ObjectMapper objectMapper, ObjectMapper logObjectMapper) {
-        return new ServiceLogAspect(objectMapper);
+    public ServiceLogAspect serviceLogAspect(@Qualifier("logObjectMapper") ObjectMapper logObjectMapper) {
+        return new ServiceLogAspect(logObjectMapper, e -> false);
     }
 }

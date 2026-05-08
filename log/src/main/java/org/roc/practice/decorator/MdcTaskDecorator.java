@@ -6,16 +6,33 @@ import org.springframework.core.task.TaskDecorator;
 import java.util.Map;
 
 /**
- * 常见的TaskDecorator包含:
- * MDC传递
- * RequestAttributes 请求传递
- * SecurityContext 登录信息传递 userId + token
- * LocaleContextHodler 国际化 时区传递
+ * 将当前线程的 MDC 上下文（traceId、spanId、appName 等）传播到异步线程。
  *
- * 通过Composite, 利用自动注入机制, 汇聚所有decorators集合
- * 通过Decorated内置的 decorate方法, 链式包装, 实现所有decorators的统一汇聚.
+ * <p>由 Log 模块统一注册为 Bean，业务系统在配置线程池时装配：
+ * <pre>{@code
+ * @Configuration
+ * @EnableAsync
+ * public class AsyncConfig implements AsyncConfigurer {
  *
- * 常见搭配 AsyncConfigurer实现, 由Config配置 taskDecorator.
+ *     @Autowired
+ *     private MdcTaskDecorator mdcTaskDecorator;
+ *
+ *     @Override
+ *     public Executor getAsyncExecutor() {
+ *         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+ *         executor.setCorePoolSize(8);
+ *         executor.setMaxPoolSize(32);
+ *         executor.setQueueCapacity(500);
+ *         executor.setThreadNamePrefix("async-");
+ *         executor.setTaskDecorator(mdcTaskDecorator);
+ *         executor.initialize();
+ *         return executor;
+ *     }
+ * }
+ * }</pre>
+ *
+ * <p>如需同时传播其他上下文（RequestAttributes、SecurityContext、LocaleContext 等），
+ * 可各自实现 {@link org.springframework.core.task.TaskDecorator} 后在 executor 上链式组合。
  */
 public class MdcTaskDecorator implements TaskDecorator {
     @Override

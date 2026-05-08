@@ -4,6 +4,7 @@ public final class TraceConstants {
     // MDC使用
     public static final String TRACE_ID = "traceId";
     public static final String SPAN_ID = "spanId";
+    public static final String PARENT_SPAN_ID = "parentSpanId";
     public static final String USER_ID = "userId";
     public static final String APP_NAME = "appName";
 

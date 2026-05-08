@@ -19,8 +19,9 @@ public class SensitiveJacksonModule extends SimpleModule {
                     List<BeanPropertyWriter> beanPropertyWriters
             ) {
                 for (BeanPropertyWriter writer : beanPropertyWriters) {
-                    if (writer.getAnnotation(Sensitive.class) != null) {
-                        writer.assignSerializer(new SensitiveFieldSerializer());
+                    Sensitive sensitive = writer.getAnnotation(Sensitive.class);
+                    if (sensitive != null) {
+                        writer.assignSerializer(new SensitiveFieldSerializer(sensitive.type()));
                     }
                 }
                 return beanPropertyWriters;
