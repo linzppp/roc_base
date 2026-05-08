@@ -13,18 +13,18 @@ import org.roc.practice.annotation.Logged;
 public class ServiceLogAspect {
     private final ObjectMapper objectMapper;
 
-    public ServiceLogAspect(ObjectMapper objectMapper){
+    public ServiceLogAspect(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
     @Around("@annotation(logged) || @within(logged)")
-    public Object around(ProceedingJoinPoint pjp, Logged logged) throws Throwable{
+    public Object around(ProceedingJoinPoint pjp, Logged logged) throws Throwable {
         MethodSignature sig = (MethodSignature) pjp.getSignature();
-        String methodName = String.format("%s.$s",sig.getDeclaringTypeName(), sig.getName());
+        String methodName = String.format("%s.$s", sig.getDeclaringTypeName(), sig.getName());
         Long start = System.currentTimeMillis();
 
-        String argsJson="";
-        if(logged.logArgs()){
+        String argsJson = "";
+        if (logged.logArgs()) {
             // TODO
             // 无法处理Byte[]流, 需要规范此场景的日志
             argsJson = objectMapper.writeValueAsString(pjp.getArgs());
@@ -33,7 +33,7 @@ public class ServiceLogAspect {
         Object result;
         try {
             result = pjp.proceed();
-        }catch (Throwable e){
+        } catch (Throwable e) {
             Long elapsed = System.currentTimeMillis() - start;
             log.warn("[{}] exception={} elapsed={}ms args={}",
                     methodName,
@@ -45,7 +45,7 @@ public class ServiceLogAspect {
         }
 
         String responseJson = "";
-        if(logged.logResult()){
+        if (logged.logResult()) {
             responseJson = objectMapper.writeValueAsString(result);
         }
 
