@@ -11,23 +11,43 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
+/**
+ * 响应体自动包装器（当前已停用，{@link #supports} 固定返回 false）。
+ *
+ * <h3>设计决策：放弃自动包装，改为 Controller 显式返回 {@code Result<T>}</h3>
+ *
+ * <p><b>放弃原因：</b>自动包装需要处理大量边界情况，维护成本高：
+ * <ul>
+ *   <li>文件下载（{@code Resource} / {@code byte[]} / {@code StreamingResponseBody}）不应被包装</li>
+ *   <li>{@code String} 返回值会优先被 {@code StringHttpMessageConverter} 拦截，
+ *       {@code beforeBodyWrite} 返回的 {@code Result} 对象无法直接写出，
+ *       需要在 {@code WebMvcConfig} 中移除 {@code StringHttpMessageConverter}（参见注释代码）</li>
+ *   <li>Knife4j / Swagger UI / Spring Actuator 等三方组件的响应体会被错误包装，
+ *       需要逐一排除，白名单难以维护</li>
+ *   <li>{@code ResponseEntity} 返回值携带自定义 HTTP Status，包装后 Status 信息丢失</li>
+ * </ul>
+ *
+ * <p><b>当前方案：</b>Controller 方法显式返回 {@code Result<T>}，语义清晰，无隐式行为。
+ *
+ * <p><b>如需重新启用：</b>将 {@link #supports} 改为返回 {@code true}，
+ * 并在 {@code WebMvcConfig#extendMessageConverters} 中移除 {@code StringHttpMessageConverter}，
+ * 同时为 Actuator、文件下载等路径添加跳过逻辑。
+ */
 @RestControllerAdvice(basePackages = "org.roc.practice")
 public class ResponseAutoWrapper implements ResponseBodyAdvice<Object> {
     @Override
-    /*
-        放弃该执行方案, 不做AutoWrapper
-        由业务实现人员, 显式的在Controller当中进行结果返回.
-        避免对File, String, 三方包等情况的特殊处理
-     */
+    // 当前方案：停用自动包装。详见类注释。
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType){
         return false;
     }
 
     @Override
     /*
-      对于Spring框架， 其结果返回第一步是执行 Convert 选择，第二步是进行 beforeBodyWrite处理， 第三步是进行 Convert处理。
-      针对String， 会采用StringHttpMessageConverter， 它接受的参数只能是String。
-      本项目框架规则为 JSON REST API， 采用 extendMessageConverters 进行配置处理
+      Spring 响应处理流程：① 选择 Converter → ② beforeBodyWrite → ③ Converter 写出。
+      String 返回值会被 StringHttpMessageConverter（支持 */*）优先匹配，
+      beforeBodyWrite 若返回 Result 对象，StringHttpMessageConverter 无法写出会抛 ClassCastException。
+      解决方案：在 WebMvcConfig#extendMessageConverters 中移除 StringHttpMessageConverter，
+      或将其 supportedMediaTypes 限制为 text/plain（参见 WebMvcConfig 注释代码）。
      */
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType,
                                   Class<? extends HttpMessageConverter<?>> selectedConverterType,

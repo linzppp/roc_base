@@ -8,7 +8,7 @@ import org.roc.practice.result.PageVo;
 public class PageConvertUtil {
     private PageConvertUtil() {}
 
-    private static <T> PageVo<T> toPageVo(IPage<T> page){
+    public static <T> PageVo<T> toPageVo(IPage<T> page){
         return PageVo.of(
                 page.getRecords(),
                 (int) page.getTotal(),
@@ -17,11 +17,11 @@ public class PageConvertUtil {
         );
     }
 
-    private static<T> Page<T> toMpPage(PageQuery query){
+    public static<T> Page<T> toMpPage(PageQuery query){
         return toMpPage(query, null, false);
     }
 
-    private static <T> Page<T> toMpPage(PageQuery query, String validatedOrderBy, boolean asc){
+    public static <T> Page<T> toMpPage(PageQuery query, String validatedOrderBy, boolean asc){
         Page<T> page = new Page<>(query.getSafeCurrent(), query.getSafeSize());
 
         if(validatedOrderBy != null){

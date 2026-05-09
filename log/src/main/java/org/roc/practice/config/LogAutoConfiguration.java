@@ -2,13 +2,16 @@ package org.roc.practice.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import org.roc.practice.aspect.AuditLogAspect;
 import org.roc.practice.aspect.ServiceLogAspect;
 import org.roc.practice.decorator.MdcTaskDecorator;
 import org.roc.practice.filter.AccessLogFilter;
 import org.roc.practice.filter.TraceIdFilter;
 import org.roc.practice.serializer.SensitiveJacksonModule;
+import org.roc.practice.spi.AuditLogHandler;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -64,6 +67,19 @@ public class LogAutoConfiguration {
     @Bean
     public MdcTaskDecorator mdcTaskDecorator() {
         return new MdcTaskDecorator();
+    }
+
+    /**
+     * 审计日志切面，仅在业务系统提供 {@link AuditLogHandler} Bean 时才注册。
+     *
+     * <p>业务系统实现 {@code AuditLogHandler} 并注册为 Bean 即可激活审计功能，
+     * 无需修改任何框架配置。
+     */
+    @Bean
+    @ConditionalOnBean(AuditLogHandler.class)
+    public AuditLogAspect auditLogAspect(AuditLogHandler auditLogHandler,
+                                         @Qualifier("logObjectMapper") ObjectMapper logObjectMapper) {
+        return new AuditLogAspect(auditLogHandler, logObjectMapper);
     }
 
     /**

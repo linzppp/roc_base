@@ -45,37 +45,38 @@ Dependency direction: `demo` → `web` + `bom`; `web` → `core`; `data` → `co
 
 ### Unified Response Wrapper
 
-All controller responses are automatically wrapped in `Result<T>` via `ResponseAutoWrapper` (a `ResponseBodyAdvice`). Controllers can return raw objects; the wrapper converts them to `Result.success(data)` transparently.
+Controller 方法**显式返回** `Result<T>`，不使用自动包装（`ResponseAutoWrapper` 已停用）。
 
-- `Result<T>` — envelope: `{bizCode, msg, data, traceId}` (`traceId` is a placeholder, not yet populated)
+- `Result<T>` — envelope: `{bizCode, msg, data, traceId}`
 - `IResultCode` — interface: `getCode()` / `getMessage()`; implement to define custom result code enums
 - `CommonResultCode` — built-in enum:
   - `SUCCESS("00000")`, `PARAM_ERROR("A0001")`, `TOKEN_INVALID("A0002")`, `NO_PERMISSION("A0003")`, `NOT_FOUND("A0004")`, `NOT_READABLE("A0005")`, `RESUBMIT_FAILED("B0001")`, `SYSTEM_ERROR("C0001")`, `REMOTE_CALL_FAILED("D0001")`
-- `ResponseAutoWrapper` — skips wrapping if body is already a `Result`
-- `WebMvcConfig` removes `StringHttpMessageConverter` so String return types are wrapped correctly (not intercepted before `ResponseAutoWrapper`)
 - `JacksonConfig` registers: `Long`/`long` serialized as String (avoids JS precision loss for snowflake IDs), `LocalDateTime` formatted as `"yyyy-MM-dd HH:mm:ss"`, `FAIL_ON_UNKNOWN_PROPERTIES` disabled (tolerates extra fields from downstream services)
 
 ### Exception Handling
 
-`GlobalExceptionHandler` (`@RestControllerAdvice(basePackages = "org.roc.practice")`) handles:
+`GlobalExceptionHandler` (`@RestControllerAdvice`，覆盖全部包) handles:
 
-| Exception | HTTP Status | Use case |
+**HTTP 状态码策略：所有异常响应均返回 HTTP 200，通过 `bizCode` 区分业务成功/失败。**
+设计动机：避免与 Sentinel 熔断器 HTTP 错误率统计冲突；这是国内中大型互联网系统的主流做法。
+
+| Exception | bizCode | Use case |
 |---|---|---|
-| `BusinessException` | 200 | Expected user-facing business errors; carries `IResultCode` |
-| `RocSystemException` | 500 | Logic bugs / data inconsistency needing dev investigation; logs the URI |
-| `MethodArgumentNotValidException` / `BindException` | 400 | Bean validation failures; `msg` = first field error, `data` = all field errors as `Map<String, String>` |
-| `HttpMessageNotReadableException` | 400 | Malformed JSON / type mismatch in request body → `NOT_READABLE` |
-| `Exception` | 500 | Catch-all fallback; logs full stack trace → `SYSTEM_ERROR` |
+| `BusinessException` | 业务自定义 | 预期的用户侧业务错误，携带 `IResultCode` |
+| `RocSystemException` | `SYSTEM_ERROR` | 逻辑 Bug / 数据不一致，需研发介入，记录 URI |
+| `MethodArgumentNotValidException` / `BindException` | `PARAM_ERROR` | Bean 校验失败；`msg` = 第一个字段错误，`data` = 所有字段错误 `Map` |
+| `HttpMessageNotReadableException` | `NOT_READABLE` | 请求体格式错误 / 类型不匹配 |
+| `Exception` | `SYSTEM_ERROR` | 兜底；打完整堆栈日志 |
 
 Usage:
 ```java
-// Business error (user should see message, HTTP 200)
+// 业务错误（用户可见，HTTP 200，bizCode 非 00000）
 throw new BusinessException(CommonResultCode.NOT_FOUND, "optional custom msg");
 
-// System/logic bug (HTTP 500, triggers alerts)
+// 系统级 Bug（HTTP 200，bizCode=C0001，触发告警）
 throw new RocSystemException(CommonResultCode.SYSTEM_ERROR, "detail for logs");
 
-// Return error without throwing
+// 不抛异常，直接返回错误响应
 return Result.fail(CommonResultCode.NO_PERMISSION);
 ```
 

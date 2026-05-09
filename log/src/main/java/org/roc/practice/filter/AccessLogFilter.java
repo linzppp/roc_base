@@ -39,24 +39,14 @@ public class AccessLogFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain chain)
-            throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
         long start = System.currentTimeMillis();
         try {
             chain.doFilter(request, response);
         } finally {
             long elapsed = System.currentTimeMillis() - start;
             String msg = "ACCESS | {} {} status={} elapsed={}ms ip={}";
-            Object[] args = {
-                    request.getMethod(),
-                    buildUri(request),
-                    response.getStatus(),
-                    elapsed,
-                    getClientIp(request)
-            };
+            Object[] args = {request.getMethod(), buildUri(request), response.getStatus(), elapsed, getClientIp(request)};
             if (elapsed >= SLOW_REQUEST_THRESHOLD_MS) {
                 log.warn(msg, args);
             } else {
