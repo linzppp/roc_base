@@ -10,6 +10,14 @@ import org.roc.practice.annotation.Logged;
 
 import java.util.function.Predicate;
 
+/**
+ * AOP级日志, 通过自定义注释Logged, 面向Service及其他非Controller提供日志服务
+ * 记录请求耗时, 可选的记录入参, 出参
+ * 将依据 SensitiveFieldSerializer 进行脱敏
+ * 根据是否为 BusinessException异常, 进行WARN 或 ERROR级别日志.
+ * 不进行INFO级别日志, 因为只存在自定义注解, 可以更好的进行运维监控报警.
+ *
+ */
 @Aspect
 @Slf4j
 public class ServiceLogAspect {
@@ -28,9 +36,14 @@ public class ServiceLogAspect {
         this.isBusinessException = isBusinessException;
     }
 
-    @Around("@annotation(logged) || @within(logged)")
-    public Object around(ProceedingJoinPoint pjp, Logged logged) throws Throwable {
+    @Around("@annotation(org.roc.practice.annotation.Logged) || @within(org.roc.practice.annotation.Logged)")
+    public Object around(ProceedingJoinPoint pjp) throws Throwable {
         MethodSignature sig = (MethodSignature) pjp.getSignature();
+        // 方法级注解优先，回退到类级注解，避免两个分支同时匹配时的绑定歧义
+        Logged logged = sig.getMethod().getAnnotation(Logged.class);
+        if (logged == null) {
+            logged = (Logged) sig.getDeclaringType().getAnnotation(Logged.class);
+        }
         String methodName = String.format("%s.%s", sig.getDeclaringTypeName(), sig.getName());
         long start = System.currentTimeMillis();
 
@@ -61,7 +74,7 @@ public class ServiceLogAspect {
         }
 
         long elapsed = System.currentTimeMillis() - start;
-        log.debug("[{}] elapsed={}ms args={} resp={}", methodName, elapsed, argsJson, responseJson);
+        log.info("[{}] elapsed={}ms args={} resp={}", methodName, elapsed, argsJson, responseJson);
         return result;
     }
 

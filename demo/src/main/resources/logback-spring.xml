@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+    <!-- 通过 springProperty 在 Logback 初始化阶段从 Spring Environment 读取属性 -->
+    <springProperty scope="context" name="APP_NAME" source="spring.application.name" defaultValue="roc-app"/>
+    <springProperty scope="context" name="ACTIVE_PROFILE" source="spring.profiles.active" defaultValue="unknown"/>
 
     <!-- ========== 本地开发：可读彩色控制台 ========== -->
     <springProfile name="local,dev">
@@ -20,20 +23,18 @@
 
         <appender name="JSON_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <file>logs/app.log</file>
-            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
                 <fileNamePattern>logs/app.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
-                <timeBasedFileNamingAndTriggeringPolicy
-                        class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                    <maxFileSize>200MB</maxFileSize>
-                </timeBasedFileNamingAndTriggeringPolicy>
+                <maxFileSize>200MB</maxFileSize>
                 <maxHistory>7</maxHistory>
+                <totalSizeCap>3GB</totalSizeCap>
             </rollingPolicy>
 
             <!-- LogstashEncoder 自动将 MDC 所有字段输出为 JSON 字段 -->
             <encoder class="net.logstash.logback.encoder.LogstashEncoder">
                 <!-- 注入静态字段：服务名、环境 -->
 
-                <customFields>{"appName":"${spring.application.name:-roc-app}","env":"${spring.profiles.active:-unknown}"}</customFields>
+                <customFields>{"appName":"${APP_NAME}","env":"${ACTIVE_PROFILE}"}</customFields>
             </encoder>
         </appender>
 
@@ -41,7 +42,7 @@
         <appender name="ASYNC_JSON" class="ch.qos.logback.classic.AsyncAppender">
             <queueSize>512</queueSize>
             <!-- 队列满时不丢弃 WARN/ERROR -->
-            <discardingThreshold>0</discardingThreshold>
+            <discardingThreshold>20</discardingThreshold>
             <appender-ref ref="JSON_FILE"/>
         </appender>
 

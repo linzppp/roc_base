@@ -9,10 +9,34 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Set;
 
+/**
+ * Filter 级日志
+ * 面向所有Request请求进行日志记录
+ * 进行超时请求采用WARN级别, 其他非超时请求采用INFO级别记录
+ * 通过X-Real-IP, X-Forwarded-For, RemoteAddr 进行请求IP记录
+ * 未对Query进行脱敏处理.
+ * 通过 excludedPrefixes 跳过监控/文档等基础设施端点，避免日志噪声.
+ */
 @Slf4j
 public class AccessLogFilter extends OncePerRequestFilter {
     private static final long SLOW_REQUEST_THRESHOLD_MS = 1000;
+
+    private final Set<String> excludedPrefixes;
+
+    public AccessLogFilter(Set<String> excludedPrefixes) {
+        this.excludedPrefixes = excludedPrefixes;
+    }
+
+    /**
+     * 匹配任意排除前缀时跳过，doFilterInternal 不会被调用。
+     */
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+        return excludedPrefixes.stream().anyMatch(uri::startsWith);
+    }
 
     @Override
     protected void doFilterInternal(

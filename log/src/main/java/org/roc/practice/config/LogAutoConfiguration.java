@@ -9,17 +9,31 @@ import org.roc.practice.filter.TraceIdFilter;
 import org.roc.practice.serializer.SensitiveJacksonModule;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 
+import java.util.LinkedHashSet;
+import java.util.List;
+
 @Configuration
 @ConditionalOnWebApplication
 public class LogAutoConfiguration {
     @Value("${spring.application.name:unknown}")
     private String appName;
+
+    /**
+     * 访问日志排除前缀，匹配的请求不记录访问日志。
+     * 默认排除：
+     *   /actuator   — Spring Boot Actuator（健康检查、Prometheus 抓取等）
+     *   /favicon.ico — 浏览器自动请求
+     *   /doc.html / /v3/api-docs / /swagger-ui / /webjars — Knife4j / OpenAPI 文档
+     */
+    @Value("${roc.log.access.exclude-prefixes:/actuator,/favicon.ico,/doc.html,/v3/api-docs,/swagger-ui,/webjars}")
+    private List<String> accessLogExcludePrefixes;
 
     @Bean("logObjectMapper")
     public ObjectMapper logObjectMapper() {
@@ -39,9 +53,9 @@ public class LogAutoConfiguration {
     }
 
     @Bean
-    public FilterRegistrationBean<AccessLogFilter> accessLogFilterFilterRegistrationBean(){
+    public FilterRegistrationBean<AccessLogFilter> accessLogFilterRegistrationBean(){
         FilterRegistrationBean<AccessLogFilter> registration = new FilterRegistrationBean<>();
-        registration.setFilter(new AccessLogFilter());
+        registration.setFilter(new AccessLogFilter(new LinkedHashSet<>(accessLogExcludePrefixes)));
         registration.addUrlPatterns("/*");
         registration.setOrder(Ordered.HIGHEST_PRECEDENCE+1);
         return registration;
@@ -52,7 +66,19 @@ public class LogAutoConfiguration {
         return new MdcTaskDecorator();
     }
 
+    /**
+     * 默认实现：所有异常均视为系统异常（error 级别）。
+     *
+     * <p>业务系统如需区分业务异常（warn）与系统异常（error），在自己的配置类中声明同类型 Bean 覆盖即可：
+     * <pre>{@code
+     * @Bean
+     * public ServiceLogAspect serviceLogAspect(@Qualifier("logObjectMapper") ObjectMapper logObjectMapper) {
+     *     return new ServiceLogAspect(logObjectMapper, e -> e instanceof BusinessException);
+     * }
+     * }</pre>
+     */
     @Bean
+    @ConditionalOnMissingBean(ServiceLogAspect.class)
     public ServiceLogAspect serviceLogAspect(@Qualifier("logObjectMapper") ObjectMapper logObjectMapper) {
         return new ServiceLogAspect(logObjectMapper, e -> false);
     }
