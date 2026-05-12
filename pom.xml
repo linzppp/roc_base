@@ -16,6 +16,7 @@
         <module>demo</module>
         <module>data</module>
         <module>log</module>
+        <module>cache</module>
     </modules>
 
     <parent>
