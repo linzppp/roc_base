@@ -1,7 +1,5 @@
 package org.roc.practice.handler;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.roc.practice.constant.CommonResultCode;
@@ -10,7 +8,6 @@ import org.roc.practice.exception.BaseException;
 import org.roc.practice.exception.BusinessException;
 import org.roc.practice.exception.RocSystemException;
 import org.roc.practice.result.Result;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;

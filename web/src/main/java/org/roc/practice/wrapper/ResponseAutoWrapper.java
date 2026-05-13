@@ -42,13 +42,6 @@ public class ResponseAutoWrapper implements ResponseBodyAdvice<Object> {
     }
 
     @Override
-    /*
-      Spring 响应处理流程：① 选择 Converter → ② beforeBodyWrite → ③ Converter 写出。
-      String 返回值会被 StringHttpMessageConverter（支持 */*）优先匹配，
-      beforeBodyWrite 若返回 Result 对象，StringHttpMessageConverter 无法写出会抛 ClassCastException。
-      解决方案：在 WebMvcConfig#extendMessageConverters 中移除 StringHttpMessageConverter，
-      或将其 supportedMediaTypes 限制为 text/plain（参见 WebMvcConfig 注释代码）。
-     */
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType,
                                   Class<? extends HttpMessageConverter<?>> selectedConverterType,
                                   ServerHttpRequest request, ServerHttpResponse response){

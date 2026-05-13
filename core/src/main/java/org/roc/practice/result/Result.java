@@ -32,7 +32,6 @@ public class Result<T> implements Serializable {
             result.setData(data);
         }
 
-        result.setTraceId(org.slf4j.MDC.get("traceId"));
         return result;
     }
 
