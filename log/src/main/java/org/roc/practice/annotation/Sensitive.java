@@ -1,5 +1,7 @@
 package org.roc.practice.annotation;
 
+import org.roc.practice.aspect.ServiceLoggedAspect;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -10,7 +12,7 @@ import java.lang.annotation.Target;
  *
  * <h3>生效范围</h3>
  * <b>仅在 {@code @Logged} 标注方法的 AOP 日志中生效。</b>
- * {@link org.roc.practice.aspect.ServiceLogAspect} 使用 {@code logObjectMapper}（注册了
+ * {@link ServiceLoggedAspect} 使用 {@code logObjectMapper}（注册了
  * {@link org.roc.practice.serializer.SensitiveJacksonModule}）序列化入参/出参，此时脱敏有效。
  *
  * <h3>不生效的场景</h3>

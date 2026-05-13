@@ -20,7 +20,7 @@ import java.util.function.Predicate;
  */
 @Aspect
 @Slf4j
-public class ServiceLogAspect {
+public class ServiceLoggedAspect {
     private static final int MAX_LOG_LENGTH = 500;
 
     private final ObjectMapper objectMapper;
@@ -31,7 +31,7 @@ public class ServiceLogAspect {
      */
     private final Predicate<Throwable> isBusinessException;
 
-    public ServiceLogAspect(ObjectMapper objectMapper, Predicate<Throwable> isBusinessException) {
+    public ServiceLoggedAspect(ObjectMapper objectMapper, Predicate<Throwable> isBusinessException) {
         this.objectMapper = objectMapper;
         this.isBusinessException = isBusinessException;
     }

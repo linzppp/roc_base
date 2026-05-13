@@ -3,7 +3,7 @@ package org.roc.practice.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.roc.practice.aspect.AuditLogAspect;
-import org.roc.practice.aspect.ServiceLogAspect;
+import org.roc.practice.aspect.ServiceLoggedAspect;
 import org.roc.practice.decorator.MdcTaskDecorator;
 import org.roc.practice.filter.AccessLogFilter;
 import org.roc.practice.filter.TraceIdFilter;
@@ -94,8 +94,8 @@ public class LogAutoConfiguration {
      * }</pre>
      */
     @Bean
-    @ConditionalOnMissingBean(ServiceLogAspect.class)
-    public ServiceLogAspect serviceLogAspect(@Qualifier("logObjectMapper") ObjectMapper logObjectMapper) {
-        return new ServiceLogAspect(logObjectMapper, e -> false);
+    @ConditionalOnMissingBean(ServiceLoggedAspect.class)
+    public ServiceLoggedAspect serviceLogAspect(@Qualifier("logObjectMapper") ObjectMapper logObjectMapper) {
+        return new ServiceLoggedAspect(logObjectMapper, e -> false);
     }
 }

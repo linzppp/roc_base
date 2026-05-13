@@ -2,6 +2,7 @@ package org.roc.practice.config;
 
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 /**
  * Cache 模块自动配置入口。
@@ -24,6 +25,10 @@ import org.springframework.context.annotation.Configuration;
  * </ul>
  */
 @Configuration
+@Import({
+        RedisConfig.class,
+        RedissonConfig.class
+})
 public class CacheAutoConfiguration {
 
 }
