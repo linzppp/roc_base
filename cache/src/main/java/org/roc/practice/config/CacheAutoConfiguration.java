@@ -1,6 +1,9 @@
 package org.roc.practice.config;
 
 
+import org.roc.practice.support.KeySpELParser;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
@@ -31,4 +34,9 @@ import org.springframework.context.annotation.Import;
 })
 public class CacheAutoConfiguration {
 
+    @Bean
+    @ConditionalOnMissingBean
+    public KeySpELParser keySpELParser() {
+        return new KeySpELParser();
+    }
 }
