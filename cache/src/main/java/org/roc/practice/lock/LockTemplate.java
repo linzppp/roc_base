@@ -1,6 +1,5 @@
 package org.roc.practice.lock;
 
-import com.fasterxml.jackson.module.blackbird.util.CheckedSupplier;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -20,12 +19,10 @@ public class LockTemplate {
                 throw new LockAcquireFailedException(lockKey);
             }
             return supplier.get();
-
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();          // 恢复中断标志
             throw new LockAcquireFailedException(lockKey, e);
         } catch (Throwable e) {
-            Thread.currentThread().interrupt();          // 恢复中断标志
             throw new RuntimeException(e);
         } finally {
             if (acquired && lock.isHeldByCurrentThread()) {
@@ -42,7 +39,6 @@ public class LockTemplate {
             return null;
         });
     }
-
 
     @FunctionalInterface
     public interface CheckedSupplier<T> {
